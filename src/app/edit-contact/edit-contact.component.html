@@ -2,52 +2,70 @@
   <h1 class="header">
     Edit Contact
   </h1>
-  <form>
+  <form [formGroup]="contactForm" (ngSubmit)="saveContact()">
     <section>
       <nav>Name/Info</nav>
       <div>
-        <input placeholder="First Name" />
-        <input placeholder="Last Name" />
-        <input placeholder="Date of Birth" />
-        <input placeholder="Favorites Ranking" />
+        <input formControlName="firstName" [class.error]="vm.firstName.touched && vm.firstName.invalid" placeholder="First Name" />
+        <em *ngIf="vm.firstName.errors?.['required'] && vm.firstName.touched">Please enter a First Name</em>
+        <em *ngIf="vm.firstName.errors?.['minlength'] && vm.firstName.touched">Please enter 3 characters</em>
+        <input formControlName="lastName" placeholder="Last Name" />
+        <input formControlName="dateOfBirth" type="date" 
+          [value]="contactForm.controls.dateOfBirth.value| date:'yyyy-MM-dd'" 
+          placeholder="Date of Birth" />
+        <div>
+          <span>Favorites Ranking</span>
+          <input formControlName="favoritesRanking" type="range" min="0" max="5" placeholder="Favorites Ranking" />
+          <span>{{vm.favoritesRanking.value}}</span>
+        </div>
+        <div>
+          <input type="checkbox" formControlName="personal"/> Personal
+        </div>
       </div>
     </section>
     <section>
       <nav>Phone</nav>
-      <div class="flex-column">
+      <div class="flex-column" formGroupName="phone">
         <div class="flex-group">
-          <input placeholder="Phone" />
+          <input placeholder="Phone" formControlName="phoneNumber"/>
           <img src="/assets/plus-grey-blue.png" class="add" />
         </div>
         <div class="radio">
-          <input type="radio" value="mobile"> Mobile
-          <input type="radio" value="work"> Work
-          <input type="radio" value="other"> Other
+          <span *ngFor="let p of phoneTypes">
+            <input type="radio" formControlName="phoneType" [value]="p.value"> {{p.title}}
+          </span>
         </div>
       </div>
     </section>
     <section>
       <nav>Address</nav>
       <div>
-        <div class="address">
+        <div class="address" [class.error]="vm.address.invalid && vm.address.dirty" formGroupName="address">
           <div class="flex-group">
-            <input placeholder="Address" />
+            <input placeholder="Address" formControlName="streetAddress" />
             <img src="/assets/plus-grey-blue.png" class="add" />
           </div>
-          <input placeholder="City" />
-          <input placeholder="State/Region" />
-          <input placeholder="Zip/Postal Code" />
-          <select>
-            <option value="home">Home</option>
-            <option value="work">Work</option>
-            <option value="mobile">Other</option>
+          <input placeholder="City" formControlName="city"/>
+          <input placeholder="State/Region" formControlName="state"/>
+          <input placeholder="Zip/Postal Code" formControlName="postalCode"/>
+          <select formControlName="addressType">
+            <option *ngFor="let a of addressTypes" [value]="a.value">{{a.title}}</option> 
           </select>
         </div>
+        <em *ngIf="vm.address.invalid && vm.address.dirty">Incomplete Address</em>
       </div>
     </section>
+    <section>
+      <nav>Notes</nav>
+      <div>
+        <textarea formControlName="notes" [class.error]="vm.notes.invalid" placeholder="Notes" rows="5"></textarea>
+        <em *ngIf="vm.notes.errors?.['restrictedWords']">Restricted Words Found ({{vm.notes.errors?.['restrictedWords']}})</em>
+      </div>
+    </section>
+    <div class="buttons">
+      <button class="secondary">Cancel</button>
+      <!-- <button class="primary" (click)="saveContact()">Save</button> -->
+      <button type="submit" [disabled]="contactForm.invalid" class="primary" >Save</button>
+    </div>
   </form>
-  <div class="buttons">
-    <button class="secondary">Cancel</button>
-    <button class="primary" (click)="saveContact()">Save</button>
-  </div>
 </div>
